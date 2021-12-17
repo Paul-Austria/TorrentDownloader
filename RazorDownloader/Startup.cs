@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using TorrentDownloaderHandler;
 
 namespace RazorDownloader
 {
@@ -55,6 +56,8 @@ namespace RazorDownloader
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
+            
+            DownloadHandler.SetupClient();
         }
     }
 }

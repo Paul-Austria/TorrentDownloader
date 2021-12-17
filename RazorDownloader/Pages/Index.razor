@@ -9,13 +9,15 @@
 
 <button class="btn btn-primary" @onclick="DownloadTorrent">Download Torrent now</button>
 
+<p>@retValue</p>
 
 @code {
     string torrentLink = "";
-    string path = "";
-
-    void DownloadTorrent()
+    string path = "/home/paule/Videos/";
+    string retValue = "";
+    async Task DownloadTorrent()
     {
-        TorrentDownloaderHandler.DownloadHandler.DownloadTorrent(torrentLink, path);
+        var test = await TorrentDownloaderHandler.DownloadHandler.DownloadTorrentAsync(path, torrentLink);
+        retValue = await TorrentDownloaderHandler.DownloadHandler.GetStatus(test);
     }
 }
