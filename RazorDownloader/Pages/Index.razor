@@ -1,0 +1,21 @@
+﻿@page "/"
+<h1>Counter</h1>
+
+
+<input  placeholder="torrentLink" @bind-value="torrentLink"/>
+<br />
+<input placeholder="path" @bind="path"/>
+<br />
+
+<button class="btn btn-primary" @onclick="DownloadTorrent">Download Torrent now</button>
+
+
+@code {
+    string torrentLink = "";
+    string path = "";
+
+    void DownloadTorrent()
+    {
+        TorrentDownloaderHandler.DownloadHandler.DownloadTorrent(torrentLink, path);
+    }
+}
