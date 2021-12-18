@@ -1,23 +1,95 @@
 ﻿@page "/"
+@using TorrentDownloaderHandler
 <h1>Counter</h1>
 
 
 <input  placeholder="torrentLink" @bind-value="torrentLink"/>
-<br />
-<input placeholder="path" @bind="path"/>
 <br />
 
 <button class="btn btn-primary" @onclick="DownloadTorrent">Download Torrent now</button>
 
 <p>@retValue</p>
 
+
+
+
+<hr/>
+<h3>Paths</h3>
+
+<input @bind-value="newFolderName" placeholder="add new folder"/>
+<button class="btn btn-primary" @onclick="AddNewFolder">AddNewFolder</button>
+
+<hr/>
+
+@foreach(var item in currentPathSplit.Select((value,i) => new {i,value})){
+    <button @onclick="@(() => GotoPath(@item.i))">@item.value</button>
+    
+}
+<ul>
+    @foreach (var l in paths)
+    {
+        <li @onclick="@(() => UpdatePath(l))">@l</li>
+    }
+</ul>
+
 @code {
     string torrentLink = "";
-    string path = "/home/paule/Videos/";
+    string path = "/";
     string retValue = "";
+    string newFolderName = "";
+    List<string> paths = new List<string>();
+
+    List<string> currentPathSplit = new List<string>();
+
+
+    void AddNewFolder()
+    {
+        FileStructureHandler.AddNewFolder(path, newFolderName);
+        newFolderName = "";
+        UpdatePath(path);
+    }
+    
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+        paths = FileStructureHandler.GetSubPaths(path);
+        currentPathSplit = path.Split("/").ToList();
+        currentPathSplit[0] = "/";
+        currentPathSplit.RemoveAt(currentPathSplit.Count-1);
+    }
+
+
+    void GotoPath(int index)
+    {
+        string newPath = "/";
+        int counter = 0;
+        foreach(var x in currentPathSplit)
+        {
+            newPath += x + "/";
+            if (counter == index) break;
+            counter++;
+        };
+        UpdatePath(newPath);
+    }
+    void UpdatePath(string path)
+    {
+        this.path = path;
+        paths = FileStructureHandler.GetSubPaths(path);
+        currentPathSplit = path.Split("/").ToList();
+        currentPathSplit[0] = "/";
+        if(currentPathSplit[currentPathSplit.Count-1] == "") currentPathSplit.RemoveAt(currentPathSplit.Count-1);
+    }
+    
     async Task DownloadTorrent()
     {
         var test = await TorrentDownloaderHandler.DownloadHandler.DownloadTorrentAsync(path, torrentLink);
         retValue = await TorrentDownloaderHandler.DownloadHandler.GetStatus(test);
+        torrentLink = "";
+    }
+
+    void UpdateDirectoryListening(ChangeEventArgs e)
+    {
+        path = e.Value.ToString();
+        Console.WriteLine(path);
     }
 }
